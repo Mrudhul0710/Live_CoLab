@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register & Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebaseauth.js"></script>
+</head>
+<body>
+    <div class="container" id="signup">
+        <h1 class="form-title">Register</h1>
+        <div id="signUpMessage" class="messageDiv"></div>
+        <div class="input-group">
+           <input type="text" id="signup-username" placeholder="User Name" required>
+           <label for="signup-username">User Name</label>
+        </div>
+        <div class="input-group">
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <label for="signup-email">Email</label>
+        </div>
+        <div class="input-group">
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <label for="signup-password">Password</label>
+        </div>
+       <button class="btn" id="submitSignUp">Sign Up</button>
+       <p>Already have an account? <button id="goToSignIn">Login</button></p>
+    </div>
+
+    <div class="container" id="signIn" style="display:none;">
+        <h1 class="form-title">Login</h1>
+        <div id="signInMessage" class="messageDiv"></div>
+        <div class="input-group">
+            <input type="email" id="signin-email" placeholder="Email" required>
+            <label for="signin-email">Email</label>
+        </div>
+        <div class="input-group">
+            <input type="password" id="signin-password" placeholder="Password" required>
+            <label for="signin-password">Password</label>
+        </div>
+        <button class="btn" id="submitSignIn">Login</button>
+        <p>Don't have an account? <button id="goToSignUp">Sign Up</button></p>
+    </div>
+</body>
+</html>

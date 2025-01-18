@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic CSV Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+    <h1>Upload CSV and Visualize Data</h1>
+    <input type="file" id="csvFile" accept=".csv" />
+    <button id="downloadBtn" style="display: none;">Download Modified CSV</button>
+
+    <h3 style="margin-top: 10px;"> Update Data</h3>
+    <label for="xInput">X-Axis Value:</label>
+    <input type="text" id="xInput" placeholder="Enter X-Axis Value" />
+    <label for="yInput" style="margin-top: 5px;">Y-Axis Value:</label>
+    <input type="text" id="yInput" placeholder="Enter Y-Axis Value" />
+    <button id="updateBtn">Update Value</button>
+
+    <h3>Bar Chart</h3>
+    <canvas id="barChart" width="650" height="400"></canvas>
+    
+    <h3>Line Graph</h3>
+    <canvas id="lineGraph" width="650" height="400"></canvas>
+    
+    <h3>Scatter Plot</h3>
+    <canvas id="scatterPlot" width="650" height="400"></canvas>
+
+    <script>
+        let barChart, lineGraph, scatterPlot;
+        let originalData = [];
+        let headers = [];
+
+        // Parse CSV file
+        function parseCSV(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const csvText = event.target.result.trim();
+                    const rows = csvText.split("\n").map(row => row.split(","));
+                    headers = rows[0]; // First row is the header
+                    const data = rows.slice(1).map(row => ({
+                        x: row[0].trim(),
+                        y: parseFloat(row[1].trim())
+                    }));
+                    originalData = data;
+                    resolve(data);
+                };
+                reader.onerror = (error) => reject(error);
+                reader.readAsText(file);
+            });
+        }
+
+        // Generate Graphs
+        function generateGraphs(data) {
+            // Destroy existing charts
+            if (barChart) barChart.destroy();
+            if (lineGraph) lineGraph.destroy();
+            if (scatterPlot) scatterPlot.destroy();
+
+            const xLabels = data.map(item => item.x);
+            const yValues = data.map(item => item.y);
+
+            // Bar Chart
+            const ctxBar = document.getElementById("barChart").getContext("2d");
+            barChart = new Chart(ctxBar, {
+                type: "bar",
+                data: {
+                    labels: xLabels,
+                    datasets: [{
+                        label: `${headers[0]} vs ${headers[1]} (Bar Chart)`,
+                        data: yValues,
+                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Line Graph
+            const ctxLine = document.getElementById("lineGraph").getContext("2d");
+            lineGraph = new Chart(ctxLine, {
+                type: "line",
+                data: {
+                    labels: xLabels,
+                    datasets: [{
+                        label: `${headers[0]} vs ${headers[1]} (Line Graph)`,
+                        data: yValues,
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Scatter Plot
+            const ctxScatter = document.getElementById("scatterPlot").getContext("2d");
+            scatterPlot = new Chart(ctxScatter, {
+                type: "scatter",
+                data: {
+                    datasets: [{
+                        label: `${headers[0]} vs ${headers[1]} (Scatter Plot)`,
+                        data: data.map(item => ({ x: parseFloat(item.x), y: item.y })),
+                        backgroundColor: "rgba(75, 192, 192, 1)",
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: { display: true, text: headers[0] }
+                        },
+                        y: {
+                            title: { display: true, text: headers[1] },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Value
+        function updateValue() {
+            const xInput = document.getElementById("xInput").value.trim();
+            const yInput = parseFloat(document.getElementById("yInput").value.trim());
+
+            if (!xInput || isNaN(yInput)) {
+                alert("Please provide valid inputs.");
+                return;
+            }
+
+            const index = originalData.findIndex(item => item.x === xInput);
+            if (index !== -1) {
+                originalData[index].y = yInput;
+                generateGraphs(originalData);
+                document.getElementById("downloadBtn").style.display = "inline-block";
+            } else {
+                alert(`Value with ${headers[0]} = "${xInput}" not found.`);
+            }
+        }
+
+        // Generate CSV from Data
+        function generateCSV(data) {
+            const rows = data.map(item => `${item.x},${item.y}`).join("\n");
+            return `${headers.join(",")}\n${rows}`;
+        }
+
+        // Download CSV
+        function downloadCSV() {
+            const updatedCSV = generateCSV(originalData);
+            const blob = new Blob([updatedCSV], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "updated_data.csv";
+            link.click();
+        }
+
+        // Event Listeners
+        document.getElementById("csvFile").addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) parseCSV(file).then(generateGraphs);
+        });
+
+        document.getElementById("updateBtn").addEventListener("click", updateValue);
+        document.getElementById("downloadBtn").addEventListener("click", downloadCSV);
+    </script>
+</body>
+</html>

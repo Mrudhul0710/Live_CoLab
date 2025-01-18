@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room - LiveCoLab</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h1>LiveCoLab</h1>
+        <div class="user-info">
+            <a href="analytics.html" class="btn">Analytics</a>
+            <span id="username"></span>
+            <button class="logout" id="logoutButton">Logout</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="room-header">
+            <h2 id="roomName">Room Name</h2>
+        </div>
+        <div class="chat">
+            <h3>Chat</h3>
+            <div id="chatMessages" class="chat-messages">
+                <!-- Chat messages will be dynamically populated -->
+            </div>
+            <div class="chat-input">
+                
+                <button id="sendMessageButton" class="btn">Send</button>
+            </div>
+            <textarea id="chatInput" placeholder="Type your message..."></textarea>
+            <!-- <button id="sendMessageButton" class="btn">Send</button> -->
+        </div>
+    </div>
+    <script type="module" src="room.js"></script>
+</body>
+</html>
